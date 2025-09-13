@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
-
 	"gorm.io/gorm"
+	"github.com/twpayne/go-geom"
+	"github.com/twpayne/go-geom/encoding/ewkb"
+	"encoding/hex"
 )
 
 type ColumnType struct {
@@ -134,4 +136,48 @@ func GetLayerSchema(db *gorm.DB, layerName string) ([]Column, error) {
 func GetLayerGeometry(_ *gorm.DB) (string, uint, error) {
 	// Leave room for expansion layter
 	return "Point", 4326, nil
+}
+
+type FeatureRow struct {
+	Fid int32
+	Geom geom.Point
+	Attr map[string]string;
+}
+
+func DBLayer_GetAllFeatures(db *gorm.DB, layername string) ([]FeatureRow, error) {
+	var rows []map[string]interface{};
+	err := db.Table(layername).Find(&rows).Error
+	if err != nil {
+		return []FeatureRow{}, err;
+	}
+
+	features := make([]FeatureRow, 0, len(rows));
+	for _, row := range(rows) {
+
+		hexStr := row["geom"].(string)
+		pointBytes, err := hex.DecodeString(hexStr)
+		if err != nil {
+			return []FeatureRow{}, err
+		}
+
+		point, err := ewkb.Unmarshal(pointBytes)
+		if err != nil {
+			return []FeatureRow{}, err
+		}	
+
+		f := FeatureRow{
+			Fid: row["fid"].(int32),
+			Geom: *(point.(*geom.Point)),
+			Attr: make(map[string]string),
+
+		}
+		for k, v := range(row) {
+			if k != "fid" && k != "geom" {
+				f.Attr[k] = v.(string)
+			}
+		}
+		features = append(features, f)
+	}
+
+	return features, nil
 }

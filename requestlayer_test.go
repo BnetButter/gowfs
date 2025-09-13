@@ -231,3 +231,76 @@ func TestDescribeFeatureType(t *testing.T) {
 		t.Errorf("string not eq: \n%s\n%s", describeFeatureTypeString, expectedOutput)
 	}
 }
+
+func TestGetFeature(t *testing.T) {
+	tableName1 := CreateLayerTable{
+		LayerName: "layer_1",
+		LayerTitle: "Layer 1",
+		Columns: []ColumnType{ 
+			{ 
+				Name: "name",
+				Dtype: "TEXT",
+			},
+			{
+				Name: "address",
+				Dtype: "TEXT",
+			},
+		},
+	}
+	db := Ensure(gorm.Open(postgres.Open(CONNECTION_STRING), &gorm.Config{}))
+	sqlDb := Ensure(db.DB());
+	defer sqlDb.Close()
+	CreateLayer(db, tableName1).Unwrap();
+	defer DeleteLayer(db, "layer_1");
+
+	sqlInsert := `
+		INSERT INTO layer_1 (geom, name, address) VALUES
+		(ST_GeomFromText('POINT(12.123 42.789)', 4326), 'Kevin',   '1234 Somewhere Ave'),
+		(ST_GeomFromText('POINT(14.128 12.238)', 4326), 'Lawrance','8291 Foobar Drive'),
+		(ST_GeomFromText('POINT(28.479 94.177)', 4326), 'Peter',   '192 Hello World Blvd');
+	`
+
+	if db.Exec(sqlInsert).Error != nil {
+		t.Errorf("Failed to insert")
+	}
+
+	outputString := Ensure(GetFeature(db, "layer_1", nil));
+	actualString := `<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gowfs="http://example.com/gowfs" numberMatched="3" numberReturned="3">
+  <wfs:member>
+    <gowfs:layer_1 gml:id="fid.1">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>42.789000 12.123000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:name>Kevin</gowfs:name>
+      <gowfs:address>1234 Somewhere Ave</gowfs:address>
+    </gowfs:layer_1>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:layer_1 gml:id="fid.2">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>12.238000 14.128000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:name>Lawrance</gowfs:name>
+      <gowfs:address>8291 Foobar Drive</gowfs:address>
+    </gowfs:layer_1>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:layer_1 gml:id="fid.3">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>94.177000 28.479000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:name>Peter</gowfs:name>
+      <gowfs:address>192 Hello World Blvd</gowfs:address>
+    </gowfs:layer_1>
+  </wfs:member>
+</wfs:FeatureCollection>`
+	if outputString != actualString {
+		t.Errorf("Maybe the attribute orders are different? string does not eq \n%s\n%s\n", actualString, outputString)
+	}
+}

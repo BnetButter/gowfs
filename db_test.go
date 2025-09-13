@@ -297,3 +297,69 @@ func TestGetLayerSchema(t *testing.T) {
 		t.Errorf("expected columns don't match actual columns");
 	}
 }
+
+func TestGetAllFeatures(t *testing.T) {
+	tableName1 := CreateLayerTable{
+		LayerName: "layer_1",
+		LayerTitle: "Layer 1",
+		Columns: []ColumnType{ 
+			{ 
+				Name: "name",
+				Dtype: "TEXT",
+			},
+			{
+				Name: "address",
+				Dtype: "TEXT",
+			},
+		},
+	}
+	db := Ensure(gorm.Open(postgres.Open(CONNECTION_STRING), &gorm.Config{}))
+	sqlDb := Ensure(db.DB());
+	defer sqlDb.Close()
+	CreateLayer(db, tableName1).Unwrap();
+	defer DeleteLayer(db, "layer_1");
+
+	sqlInsert := `
+		INSERT INTO layer_1 (geom, name, address) VALUES
+		(ST_GeomFromText('POINT(12.123 42.789)', 4326), 'Kevin',   '4510 Laclede Ave'),
+		(ST_GeomFromText('POINT(14.128 12.238)', 4326), 'Lawrance','2145 Tenbrink'),
+		(ST_GeomFromText('POINT(28.479 94.177)', 4326), 'Peter',   '23 Olde Hamlet Dr.');
+	`
+
+	if db.Exec(sqlInsert).Error != nil {
+		t.Errorf("Failed to insert")
+	}
+	
+	features := Ensure(DBLayer_GetAllFeatures(db, "layer_1"))
+	
+	c1 := features[0].Attr["name"] == "Kevin"
+	c2 := features[1].Attr["name"] == "Lawrance"
+	c3 := features[2].Attr["name"] == "Peter"
+
+	if ! (c1 && c2 && c3) {
+		t.Errorf("Features don't match")
+	}
+
+	expectedCoord := [][]float64{
+		{
+			12.123,
+			42.789,
+		},
+		{
+			14.128,
+			12.238,
+		},
+		{
+			28.479,
+			94.177,
+		},
+	}
+	for i, row := range(features) {
+		point := row.Geom.Coords();
+		expectedPoint := expectedCoord[i];
+		if ! (point[0] == expectedPoint[0] && point[1] == expectedPoint[1]) {
+			t.Errorf("Points don't match")
+		}
+	}
+
+}

@@ -131,3 +131,39 @@ func DescribeFeatureType(db *gorm.DB, layerName string) (string, error) {
   return fmt.Sprintf(DESCRIBE_SCHEMA_TEMPLATE, string(complexTypeBytes)), nil
 }
 
+
+func GetFeature(db *gorm.DB, layerName string, query interface{}) (string, error) {
+  dbFeatures, err := DBLayer_GetAllFeatures(db, layerName)
+  if err != nil {
+    return "", err
+  }
+  var pointElements []GetFeature_WFSMember;
+  for _, feature := range(dbFeatures) {
+    var attrs []GetFeature_ColumnTag;
+
+    // Load attr
+    for k, v := range(feature.Attr) {
+      attrs = append(attrs, GetFeature_ColumnTag{
+        Tag: k,
+        Value: v,
+      })
+    }
+
+    pointCoords := feature.Geom.Coords();
+
+    pointElements = append(pointElements, GetFeature_CreatePointMember(
+        layerName,
+        uint32(feature.Fid),
+        pointCoords[0],
+        pointCoords[1],
+        attrs,
+      ))
+  }
+
+  getFeature := GetFeature_CreateFeatureCollection(len(pointElements), pointElements);
+  getFeatureBytes, err := xml.MarshalIndent(getFeature, "", "  ");
+  if err != nil { 
+    return "", err
+  }
+  return string(getFeatureBytes), nil
+}

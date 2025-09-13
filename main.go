@@ -78,8 +78,13 @@ func owsHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 		w.Header().Set("Content-Type","application/xml")
 		w.Write([]byte(xmlstring));
 	} else if request == "GetFeature" {
-		// layerName := getAny(query, "typeName", "TYPENAME", "typeNames", "TYPENAMES", "typename")
-		
+		layerName := getAny(query, "typeName", "TYPENAME", "typeNames", "TYPENAMES", "typename")
+		xmlstring, err := GetFeature(db, layerName, nil);
+		if err != nil {
+			http.Error(w, "internal server error", http.StatusInternalServerError);
+		}
+		w.Header().Set("Content-Type", "application/xml");
+		w.Write([]byte(xmlstring));
 	}
 
 }
