@@ -59,6 +59,7 @@ type LayerMetadata struct {
 	Id uint `gorm:"primaryKey"`
 	LayerName string `gorm:"unique"`
 	LayerTitle string `gorm:"type:text"`
+	UserId int `gorm:"type:integer"`
 	// GeomType string 
 	// EPSG uint
 }
@@ -81,6 +82,26 @@ func CreateLayer(db *gorm.DB, params CreateLayerTable) Result[string] {
 	return Ok(params.LayerName)
 }
 
+
+func CreateLayerByUser(db *gorm.DB, params CreateLayerTable, userid int) Result[string] {
+	
+	sql_statement, err := createTableStatement(params).Maybe()
+	if err != nil {
+		return Err[string](err)
+	}
+	
+	if err := db.Exec(sql_statement).Error; err != nil {
+		return Err[string](err)
+	}
+
+	if err := db.Create(& LayerMetadata{ LayerName: params.LayerName, LayerTitle: params.LayerTitle, UserId: userid }).Error; err != nil {
+		return Err[string](err)
+	}
+
+	return Ok(params.LayerName)
+}
+
+
 func DeleteLayer(db *gorm.DB, layername string) error {
 	err := db.Where("layer_name = ?", layername).
 		Delete(&LayerMetadata{}).
@@ -96,6 +117,12 @@ func DeleteLayer(db *gorm.DB, layername string) error {
 func GetLayerMetadata(db *gorm.DB) ([]LayerMetadata, error){
 	var layers []LayerMetadata;
 	err := db.Find(&layers).Error;
+	return layers, err;
+}
+
+func GetLayerMetadataByUser(db *gorm.DB, userid int) ([]LayerMetadata, error){
+	var layers []LayerMetadata;
+	err := db.Where("user_id = ?", userid).Find(&layers).Error;
 	return layers, err;
 }
 

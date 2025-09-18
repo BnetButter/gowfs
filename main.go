@@ -8,7 +8,34 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"github.com/golang-jwt/jwt/v5"
 )
+
+func ParseSub(tokenString string) (int, error) {
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		return []byte(JWT_SECRET), nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return 0, fmt.Errorf("invalid token")
+	}
+
+	// Since you always store `sub` as an int, just assert directly
+	sub, ok := claims["sub"].(float64)
+	if !ok {
+		return 0, fmt.Errorf("sub claim not an int")
+	}
+
+	return int(sub), nil
+}
+
 
 type OWSResponse struct {
 	Message string `json:"message"`
@@ -52,7 +79,18 @@ func owsHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	version := getAny(query, "version", "VERSION") // must be 2.0.0
 	service := getAny(query, "service", "SERVICE") // Must be WFS
 	request := getAny(query, "request", "REQUEST") // Could be GetFeature, GetCapabilities, DescribeFeatureType
+	accessToken := getAny(query, "access_token", "ACCESS_TOKEN")
 
+	if accessToken == "" {
+		http.Error(w, "forbidden", http.StatusForbidden)
+		return
+	}
+
+	userId, err := ParseSub(accessToken);
+	if err != nil {
+		http.Error(w, "Failed to extract JWT", http.StatusInternalServerError)
+		return
+	}
 
 	if err := validateInitialQuery(version, service, request); err != nil {
 		w.Header().Set("Content-Type", "application/json")
@@ -61,7 +99,7 @@ func owsHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	}
 
 	if request == "GetCapabilities" {
-		xmlstring, err := GetCapabilities(db).Maybe()
+		xmlstring, err := GetCapabilities(db, userId).Maybe()
 		if err != nil {
 			http.Error(w, "internal server error", http.StatusInternalServerError)
 		}

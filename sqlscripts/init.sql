@@ -1,6 +1,6 @@
-CREATE TABLE layer_metadata (id SERIAL PRIMARY KEY, layer_name TEXT UNIQUE, layer_title TEXT);
-INSERT INTO layer_metadata (layer_name, layer_title) VALUES ('test_layer_1', 'Who Lives Where');
-INSERT INTO layer_metadata (layer_name, layer_title) VALUES ('test_layer_2', 'File Owners');
+CREATE TABLE layer_metadata (id SERIAL PRIMARY KEY, layer_name TEXT UNIQUE, layer_title TEXT, user_id INTEGER);
+INSERT INTO layer_metadata (layer_name, layer_title, user_id) VALUES ('test_layer_1', 'Who Lives Where', 0);
+INSERT INTO layer_metadata (layer_name, layer_title, user_id) VALUES ('test_layer_2', 'File Owners', 0);
 
 CREATE TABLE test_layer_1 (fid SERIAL PRIMARY KEY, geom GEOMETRY(POINT, 4326), name TEXT, address TEXT);
 CREATE TABLE test_layer_2 (fid SERIAL PRIMARY KEY, geom GEOMETRY(POINT, 4326), username TEXT, filename TEXT);

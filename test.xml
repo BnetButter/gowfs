@@ -1,0 +1,68 @@
+<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gowfs="http://example.com/gowfs" numberMatched="6" numberReturned="6">
+  <wfs:member>
+    <gowfs:test_layer_1 gml:id="fid.1">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>42.789000 12.123000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:name>Kevin</gowfs:name>
+      <gowfs:address>4510 Laclede Ave</gowfs:address>
+    </gowfs:test_layer_1>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:test_layer_1 gml:id="fid.2">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>12.238000 14.128000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:address>2145 Tenbrink</gowfs:address>
+      <gowfs:name>Lawrance</gowfs:name>
+    </gowfs:test_layer_1>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:test_layer_1 gml:id="fid.3">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>94.177000 28.479000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:name>Peter</gowfs:name>
+      <gowfs:address>23 Olde Hamlet Dr.</gowfs:address>
+    </gowfs:test_layer_1>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:test_layer_1 gml:id="fid.4">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>42.789000 12.123000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:name>Kevin</gowfs:name>
+      <gowfs:address>4510 Laclede Ave</gowfs:address>
+    </gowfs:test_layer_1>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:test_layer_1 gml:id="fid.5">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>12.238000 14.128000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:name>Lawrance</gowfs:name>
+      <gowfs:address>2145 Tenbrink</gowfs:address>
+    </gowfs:test_layer_1>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:test_layer_1 gml:id="fid.6">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>94.177000 28.479000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:name>Peter</gowfs:name>
+      <gowfs:address>23 Olde Hamlet Dr.</gowfs:address>
+    </gowfs:test_layer_1>
+  </wfs:member>
+</wfs:FeatureCollection>

@@ -64,17 +64,28 @@ const GET_CAPABILITES_XML_TEMPLATE string =
 
 
 
-func GetCapabilities(db *gorm.DB) Result[string] {
+func GetCapabilities(db *gorm.DB, user ...int) Result[string] {
+
 	t, err := template.New("GetCapabilities").Parse(GET_CAPABILITES_XML_TEMPLATE);
 	if err != nil {
 		return Err[string](err);
 	}
 	
-	
-	layerMetadata, err := GetLayerMetadata(db);
-	if err != nil {
-		return Err[string](err);
-	}
+  var layerMetadata []LayerMetadata;
+	if len(user) == 0 {
+    layerMetadata, err = GetLayerMetadata(db);
+    if err != nil {
+      return Err[string](err);
+    }
+  } else if len(user) == 1 {
+    layerMetadata, err = GetLayerMetadataByUser(db, user[0]);
+    if err != nil {
+      return Err[string](err);
+    }
+  } else {
+    return Err[string](fmt.Errorf("invalid argument call"))
+  }
+
 
 	featureXMLString := ""
 

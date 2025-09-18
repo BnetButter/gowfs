@@ -363,3 +363,114 @@ func TestGetAllFeatures(t *testing.T) {
 	}
 
 }
+
+
+
+func TestGetLayerMetadataByUser(t *testing.T) {
+	tableName1 := CreateLayerTable{
+		LayerName: "layer_1",
+		LayerTitle: "Layer 1",
+		Columns: []ColumnType{ 
+			{ 
+				Name: "name",
+				Dtype: "TEXT",
+			},
+			{
+				Name: "address",
+				Dtype: "TEXT",
+			},
+		},
+	}
+
+	tableName2 := CreateLayerTable{
+		LayerName: "layer_2",
+		LayerTitle: "Layer 2",
+		Columns: []ColumnType{ 
+			{ 
+				Name: "foo",
+				Dtype: "TEXT",
+			},
+			{
+				Name: "bar",
+				Dtype: "TEXT",
+			},
+		},
+	}
+
+	tableName3 := CreateLayerTable{
+		LayerName: "layer_3",
+		LayerTitle: "Layer 3",
+		Columns: []ColumnType{ 
+			{ 
+				Name: "spam",
+				Dtype: "TEXT",
+			},
+			{
+				Name: "egg",
+				Dtype: "TEXT",
+			},
+		},
+	}
+
+	db, err := gorm.Open(postgres.Open(CONNECTION_STRING), &gorm.Config{});
+	if err != nil {
+		t.Errorf("%s", err.Error());
+	}
+	db.AutoMigrate(& LayerMetadata{});
+
+	sqlDB, err := db.DB();
+	if err != nil {
+		log.Fatal(err);
+	}
+
+	defer sqlDB.Close()
+
+	CreateLayerByUser(db, tableName1, 1).Unwrap();
+	defer DeleteLayer(db, "layer_1");
+	
+	CreateLayerByUser(db, tableName2, 2).Unwrap();
+	defer DeleteLayer(db, "layer_2")
+
+	
+	CreateLayerByUser(db, tableName3, 1).Unwrap();
+	defer DeleteLayer(db, "layer_3")
+
+
+	actualLayerMetadata := Ensure(GetLayerMetadataByUser(db, 1));
+	expectedLayerMetadata := []LayerMetadata{
+		{
+			LayerName: "layer_1",
+			LayerTitle: "Layer 1",
+		},
+		{
+			LayerName: "layer_3",
+			LayerTitle: "Layer 3",
+		},
+	}
+
+	if len(actualLayerMetadata) != 2 {
+		t.Errorf("should only see 2 layers for User 1")
+	}
+
+	// We can't ensure that ID starts counting at 0 so we can't use deep reflect
+	for i := 0; i < 2; i++ {
+		actual := actualLayerMetadata[i]
+		expected := expectedLayerMetadata[i]
+		layerEQ := actual.LayerName == expected.LayerName
+		titleEQ := actual.LayerTitle == expected.LayerTitle
+		if ! layerEQ && titleEQ {
+			t.Errorf("%+v != %+v", actual, expected)
+		}
+	}
+
+	expectedUser2Metadata := LayerMetadata{
+			LayerName: "layer_2",
+	}
+
+	actualUser2LayerMetadata := Ensure(GetLayerMetadataByUser(db, 2))[0];
+
+	if expectedUser2Metadata.LayerName != actualUser2LayerMetadata.LayerName {
+		t.Errorf("User 2 metadata does not match!, %s != %s\n", expectedUser2Metadata.LayerName, actualUser2LayerMetadata.LayerName)
+	}
+
+}
