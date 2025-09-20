@@ -9,7 +9,7 @@ CREATE TABLE layer_metadata (
 );
 
 -- ==========================================================
--- User 0: already has test_layer_1 and test_layer_2
+-- User 0 Layers
 -- ==========================================================
 CREATE TABLE test_layer_1 (
     fid SERIAL PRIMARY KEY,
@@ -58,13 +58,13 @@ CREATE TABLE parks_ny (
     fid SERIAL PRIMARY KEY,
     geom GEOMETRY(POINT, 4326),
     park_name TEXT,
-    size_acres INT
+    size_acres TEXT
 );
 
 INSERT INTO parks_ny (geom, park_name, size_acres) VALUES
-(ST_GeomFromText('POINT(-73.9654 40.7829)', 4326), 'Central Park', 843),
-(ST_GeomFromText('POINT(-73.968 40.660)', 4326), 'Prospect Park', 526),
-(ST_GeomFromText('POINT(-73.971 40.676)', 4326), 'Brooklyn Botanic Garden', 52);
+(ST_GeomFromText('POINT(-73.9654 40.7829)', 4326), 'Central Park', '843'),
+(ST_GeomFromText('POINT(-73.968 40.660)', 4326), 'Prospect Park', '526'),
+(ST_GeomFromText('POINT(-73.971 40.676)', 4326), 'Brooklyn Botanic Garden', '52');
 
 CREATE TABLE wifi_chicago (
     fid SERIAL PRIMARY KEY,
@@ -90,7 +90,7 @@ CREATE TABLE crime_la (
     fid SERIAL PRIMARY KEY,
     geom GEOMETRY(POINT, 4326),
     crime_type TEXT,
-    date DATE
+    date TEXT
 );
 
 INSERT INTO crime_la (geom, crime_type, date) VALUES
@@ -102,13 +102,13 @@ CREATE TABLE museums_dc (
     fid SERIAL PRIMARY KEY,
     geom GEOMETRY(POINT, 4326),
     museum_name TEXT,
-    admission BOOLEAN
+    admission TEXT
 );
 
 INSERT INTO museums_dc (geom, museum_name, admission) VALUES
-(ST_GeomFromText('POINT(-77.026 38.891)', 4326), 'Smithsonian Air & Space', TRUE),
-(ST_GeomFromText('POINT(-77.023 38.891)', 4326), 'National Gallery of Art', TRUE),
-(ST_GeomFromText('POINT(-77.019 38.888)', 4326), 'US Holocaust Memorial', FALSE);
+(ST_GeomFromText('POINT(-77.026 38.891)', 4326), 'Smithsonian Air & Space', 'true'),
+(ST_GeomFromText('POINT(-77.023 38.891)', 4326), 'National Gallery of Art', 'true'),
+(ST_GeomFromText('POINT(-77.019 38.888)', 4326), 'US Holocaust Memorial', 'false');
 
 CREATE TABLE schools_boston (
     fid SERIAL PRIMARY KEY,
@@ -134,13 +134,13 @@ CREATE TABLE hospitals_texas (
     fid SERIAL PRIMARY KEY,
     geom GEOMETRY(POINT, 4326),
     hospital_name TEXT,
-    capacity INT
+    capacity TEXT
 );
 
 INSERT INTO hospitals_texas (geom, hospital_name, capacity) VALUES
-(ST_GeomFromText('POINT(-95.3698 29.7604)', 4326), 'Houston Medical Center', 1500),
-(ST_GeomFromText('POINT(-96.797 32.7767)', 4326), 'Dallas General', 1200),
-(ST_GeomFromText('POINT(-97.7431 30.2672)', 4326), 'Austin Health', 800);
+(ST_GeomFromText('POINT(-95.3698 29.7604)', 4326), 'Houston Medical Center', '1500'),
+(ST_GeomFromText('POINT(-96.797 32.7767)', 4326), 'Dallas General', '1200'),
+(ST_GeomFromText('POINT(-97.7431 30.2672)', 4326), 'Austin Health', '800');
 
 CREATE TABLE libraries_portland (
     fid SERIAL PRIMARY KEY,
@@ -158,25 +158,25 @@ CREATE TABLE breweries_denver (
     fid SERIAL PRIMARY KEY,
     geom GEOMETRY(POINT, 4326),
     brewery_name TEXT,
-    founded_year INT
+    founded_year TEXT
 );
 
 INSERT INTO breweries_denver (geom, brewery_name, founded_year) VALUES
-(ST_GeomFromText('POINT(-104.9903 39.7392)', 4326), 'Mile High Brewing', 1995),
-(ST_GeomFromText('POINT(-105.00 39.74)', 4326), 'Rocky Mountain Ales', 2005),
-(ST_GeomFromText('POINT(-104.98 39.74)', 4326), 'Denver Beer Works', 2010);
+(ST_GeomFromText('POINT(-104.9903 39.7392)', 4326), 'Mile High Brewing', '1995'),
+(ST_GeomFromText('POINT(-105.00 39.74)', 4326), 'Rocky Mountain Ales', '2005'),
+(ST_GeomFromText('POINT(-104.98 39.74)', 4326), 'Denver Beer Works', '2010');
 
 CREATE TABLE bike_trails_seattle (
     fid SERIAL PRIMARY KEY,
     geom GEOMETRY(POINT, 4326),
     trail_name TEXT,
-    length_miles DECIMAL
+    length_miles TEXT
 );
 
 INSERT INTO bike_trails_seattle (geom, trail_name, length_miles) VALUES
-(ST_GeomFromText('POINT(-122.3321 47.6062)', 4326), 'Burke-Gilman Trail', 18.8),
-(ST_GeomFromText('POINT(-122.34 47.61)', 4326), 'Elliott Bay Trail', 5.0),
-(ST_GeomFromText('POINT(-122.31 47.63)', 4326), 'Chief Sealth Trail', 4.5);
+(ST_GeomFromText('POINT(-122.3321 47.6062)', 4326), 'Burke-Gilman Trail', '18.8'),
+(ST_GeomFromText('POINT(-122.34 47.61)', 4326), 'Elliott Bay Trail', '5.0'),
+(ST_GeomFromText('POINT(-122.31 47.63)', 4326), 'Chief Sealth Trail', '4.5');
 
 INSERT INTO layer_metadata (layer_name, layer_title, user_id) VALUES
 ('hospitals_texas', 'Texas Hospitals', 3),

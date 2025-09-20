@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OpenLayers WFS (GeoJSON)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.6.0/ol.css">
+
+<style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+<script src="https://cdn.jsdelivr.net/npm/ol@v10.6.0/dist/ol.js"></script> 
+<script>
+    // Base map layer
+    const rasterLayer = new ol.layer.Tile({
+      source: new ol.source.OSM()
+    });
+
+    // Vector layer with WFS in GeoJSON format
+    const vectorSource = new ol.source.Vector({
+      format: new ol.format.GeoJSON(),
+      url: function(extent) {
+        return '/ows'
+          + '?service=WFS'
+          + '&version=2.0.0'
+          + '&request=GetFeature'
+          + '&typename=restaurants_sf'
+          + '&outputFormat=application/json'
+          + '&srsname=EPSG:4326'
+          + '&bbox=' + extent.join(',') + ',EPSG:4326'
+          + '&access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjF9.n0_TCv6aixmt4LzFzEf18kB7ivf2SPN2SEaAdHuoAYU';
+      },
+      strategy: ol.loadingstrategy.bbox
+    });
+
+    const vectorLayer = new ol.layer.Vector({
+      source: vectorSource,
+      style: new ol.style.Style({
+        image: new ol.style.Circle({
+          radius: 6,
+          fill: new ol.style.Fill({ color: 'red' }),
+          stroke: new ol.style.Stroke({ color: 'white', width: 2 })
+        })
+      })
+    });
+
+    // Map setup
+    const map = new ol.Map({
+      target: 'map',
+      layers: [rasterLayer, vectorLayer],
+      view: new ol.View({
+        projection: 'EPSG:4326',    // since your WFS is in 4326
+        center: [0, 0], // San Francisco center
+        zoom: 0
+      })
+    });
+  </script>
+</body>
+</html>

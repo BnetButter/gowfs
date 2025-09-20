@@ -1,68 +1,24 @@
-<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gowfs="http://example.com/gowfs" numberMatched="6" numberReturned="6">
-  <wfs:member>
-    <gowfs:test_layer_1 gml:id="fid.1">
-      <gowfs:geom>
-        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-          <gml:pos>42.789000 12.123000</gml:pos>
-        </gml:Point>
-      </gowfs:geom>
-      <gowfs:name>Kevin</gowfs:name>
-      <gowfs:address>4510 Laclede Ave</gowfs:address>
-    </gowfs:test_layer_1>
-  </wfs:member>
-  <wfs:member>
-    <gowfs:test_layer_1 gml:id="fid.2">
-      <gowfs:geom>
-        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-          <gml:pos>12.238000 14.128000</gml:pos>
-        </gml:Point>
-      </gowfs:geom>
-      <gowfs:address>2145 Tenbrink</gowfs:address>
-      <gowfs:name>Lawrance</gowfs:name>
-    </gowfs:test_layer_1>
-  </wfs:member>
-  <wfs:member>
-    <gowfs:test_layer_1 gml:id="fid.3">
-      <gowfs:geom>
-        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-          <gml:pos>94.177000 28.479000</gml:pos>
-        </gml:Point>
-      </gowfs:geom>
-      <gowfs:name>Peter</gowfs:name>
-      <gowfs:address>23 Olde Hamlet Dr.</gowfs:address>
-    </gowfs:test_layer_1>
-  </wfs:member>
-  <wfs:member>
-    <gowfs:test_layer_1 gml:id="fid.4">
-      <gowfs:geom>
-        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-          <gml:pos>42.789000 12.123000</gml:pos>
-        </gml:Point>
-      </gowfs:geom>
-      <gowfs:name>Kevin</gowfs:name>
-      <gowfs:address>4510 Laclede Ave</gowfs:address>
-    </gowfs:test_layer_1>
-  </wfs:member>
-  <wfs:member>
-    <gowfs:test_layer_1 gml:id="fid.5">
-      <gowfs:geom>
-        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-          <gml:pos>12.238000 14.128000</gml:pos>
-        </gml:Point>
-      </gowfs:geom>
-      <gowfs:name>Lawrance</gowfs:name>
-      <gowfs:address>2145 Tenbrink</gowfs:address>
-    </gowfs:test_layer_1>
-  </wfs:member>
-  <wfs:member>
-    <gowfs:test_layer_1 gml:id="fid.6">
-      <gowfs:geom>
-        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
-          <gml:pos>94.177000 28.479000</gml:pos>
-        </gml:Point>
-      </gowfs:geom>
-      <gowfs:name>Peter</gowfs:name>
-      <gowfs:address>23 Olde Hamlet Dr.</gowfs:address>
-    </gowfs:test_layer_1>
-  </wfs:member>
-</wfs:FeatureCollection>
+<Transaction xmlns="http://www.opengis.net/wfs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://example.com/gowfs http://localhost:8000/ows?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjF9.n0_TCv6aixmt4LzFzEf18kB7ivf2SPN2SEaAdHuoAYU&amp;SERVICE=WFS&amp;REQUEST=DescribeFeatureType&amp;VERSION=1.0.0&amp;TYPENAME=parks_ny" version="1.0.0" service="WFS">
+   <Insert xmlns="http://www.opengis.net/wfs">
+       <parks_ny xmlns="http://example.com/gowfs">
+           <park_name xmlns="http://example.com/gowfs">f</park_name>
+           <size_acres xmlns="http://example.com/gowfs">d</size_acres>
+           <geom xmlns="http://example.com/gowfs">
+               <gml:Point>
+                   <gml:coordinates ts=" " cs=",">-74.21244970386565853,40.89557153692449987</gml:coordinates>
+               </gml:Point>
+           </geom>
+       </parks_ny>
+   </Insert>
+   <Insert xmlns="http://www.opengis.net/wfs">
+       <parks_ny xmlns="http://example.com/gowfs">
+           <park_name xmlns="http://example.com/gowfs">12</park_name>
+           <size_acres xmlns="http://example.com/gowfs">12</size_acres>
+           <geom xmlns="http://example.com/gowfs">
+               <gml:Point>
+                   <gml:coordinates ts=" " cs=",">-74.24520207755853107,40.83474570006630699</gml:coordinates>
+               </gml:Point>
+           </geom>
+       </parks_ny>
+   </Insert>
+</Transaction>
