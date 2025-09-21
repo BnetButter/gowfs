@@ -158,7 +158,6 @@ func TestXMLGetFeature(t *testing.T) {
 }
 
 func TestTransactionInsert(t *testing.T) {
-
 	const INSERTION_XML = `<Transaction xmlns="http://www.opengis.net/wfs" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gml="http://www.opengis.net/gml" xsi:schemaLocation="http://example.com/gowfs http://localhost:8000/ows?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjF9.n0_TCv6aixmt4LzFzEf18kB7ivf2SPN2SEaAdHuoAYU&amp;SERVICE=WFS&amp;REQUEST=DescribeFeatureType&amp;VERSION=1.0.0&amp;TYPENAME=parks_ny" version="1.0.0" service="WFS">
    <Insert xmlns="http://www.opengis.net/wfs">
        <parks_ny xmlns="http://example.com/gowfs">
@@ -172,27 +171,81 @@ func TestTransactionInsert(t *testing.T) {
        </parks_ny>
    </Insert>
    <Insert xmlns="http://www.opengis.net/wfs">
-       <parks_ny xmlns="http://example.com/gowfs">
-           <park_name xmlns="http://example.com/gowfs">12</park_name>
-           <size_acres xmlns="http://example.com/gowfs">12</size_acres>
+       <parks_mo xmlns="http://example.com/gowfs">
+           <park_mo xmlns="http://example.com/gowfs">12</park_mo>
+           <size_mo xmlns="http://example.com/gowfs">12</size_mo>
            <geom xmlns="http://example.com/gowfs">
                <gml:Point>
                    <gml:coordinates ts=" " cs=",">-74.24520207755853107,40.83474570006630699</gml:coordinates>
                </gml:Point>
            </geom>
-       </parks_ny>
+       </parks_mo>
    </Insert>
 </Transaction>`
-	
-	var tx Transaction;
-	if err := xml.Unmarshal([]byte(INSERTION_XML), &tx); err != nil {
-		t.Errorf("Failed to Unmarshal");
+
+	InsertionRequests, err := XMLLayer_ParseInsertionRequest(INSERTION_XML);
+	if err != nil {
+		t.Error("Failed to parse")
+	}
+	I0 := InsertionRequests[0]
+	I1 := InsertionRequests[1]
+
+	if I0.LayerName != "parks_ny" && I1.LayerName != "parks_mo" {
+		t.Errorf("Wrong Layer")
 	}
 
-	for i, ins := range tx.Inserts {
-		t.Logf("Insert %d:\n", i+1)
-		for k, v := range ins.Layer.Fields {
-			t.Logf("  %s -> %s\n", k, v)
-		}
-	}	
+	conditions := I0.Fields["park_name"] == "f" && I0.Fields["size_acres"] == "d"
+	if ! conditions {
+		t.Errorf("Bad condition")
+	}
+
+	if I1.Coordinates[0] != -74.24520207755853107 && I1.Coordinates[1] != 40.83474570006630699 {
+		t.Errorf("Bad coords")
+	}
+}
+
+func TestInsertionResponse(t *testing.T) {
+	
+	fids := []int32 {
+		32, 1, 4,
+	}
+	result := Ensure(XMLLayer_CreateInsertResponse(fids))
+	expected := `<wfs:WFS_TransactionResponse
+    version="1.0.0"
+    xmlns:wfs="http://www.opengis.net/wfs"
+    xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:gml="http://www.opengis.net/gml">
+
+  <wfs:TransactionResult>
+    <wfs:Status>
+      <wfs:SUCCESS/>
+    </wfs:Status>
+  </wfs:TransactionResult>
+
+  <wfs:TransactionSummary>
+    <wfs:totalInserted>3</wfs:totalInserted>
+    <wfs:totalUpdated>0</wfs:totalUpdated>
+    <wfs:totalDeleted>0</wfs:totalDeleted>
+  </wfs:TransactionSummary>
+
+  <wfs:InsertResults>
+    
+    <wfs:Feature>
+      <ogc:FeatureId fid="fid.32"/>
+    </wfs:Feature>
+    
+    <wfs:Feature>
+      <ogc:FeatureId fid="fid.1"/>
+    </wfs:Feature>
+    
+    <wfs:Feature>
+      <ogc:FeatureId fid="fid.4"/>
+    </wfs:Feature>
+    
+  </wfs:InsertResults>
+
+</wfs:WFS_TransactionResponse>`
+	if result != expected {
+		t.Errorf("\n%s\n--\n%s", result, expected)
+	}
 }

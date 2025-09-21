@@ -208,3 +208,42 @@ func DBLayer_GetAllFeatures(db *gorm.DB, layername string) ([]FeatureRow, error)
 
 	return features, nil
 }
+
+
+func sanitizeSql(s string) string {
+	return s;
+}
+
+func CreateInsertionSQL(request InsertRequestParams) (string, error) {
+
+	insertString := fmt.Sprintf("INSERT INTO %s (geom", sanitizeSql(request.LayerName));
+	PointGeomString := fmt.Sprintf(`ST_GeomFromText('Point(%f %f)', 4326)`, request.Coordinates[0], request.Coordinates[1])
+	for k, v := range(request.Fields) {
+		insertString += fmt.Sprintf(",%s", sanitizeSql(k))
+		PointGeomString += fmt.Sprintf(",'%s'",sanitizeSql(v))
+	}
+	insertString += fmt.Sprintf(") VALUES (%s) RETURNING fid", PointGeomString)
+	return insertString, nil
+
+}
+
+func DBLayer_InsertLayer(db *gorm.DB, insertRequests []InsertRequestParams) ([]int32, error) {
+	
+	var newIDs []int32;
+
+	for _, request := range(insertRequests) {
+		insertString, err := CreateInsertionSQL(request)
+		if err != nil {
+			return []int32{}, err
+		}
+		var newID int32;
+
+		if err := db.Raw(insertString).Scan(&newID).Error; err != nil {
+			return []int32{}, err
+		}
+		
+		newIDs = append(newIDs, newID)
+
+	}
+	return newIDs, nil
+}

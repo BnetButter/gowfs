@@ -4,6 +4,9 @@ import (
 	"encoding/xml"
 	"fmt"
 	"strings"
+	"strconv"
+	"text/template"
+	"bytes"
 )
 
 type WFSFeatureType struct {
@@ -278,26 +281,44 @@ func GetFeature_CreateFeatureCollection (numMatched int, members []GetFeature_WF
 }
 
 
-
 type Transaction struct {
 	XMLName xml.Name `xml:"Transaction"`
 	Inserts []Insert `xml:"Insert"`
 }
 
 type Insert struct {
-	Layer DynamicElement
+	Layer DynamicElement `xml:",any"`
 }
 
-// DynamicElement captures any arbitrary element and its children
 type DynamicElement struct {
 	XMLName xml.Name
 	Fields  map[string]string
+	Geom    InsertGeometry `xml:"geom"`
 }
+
+type InsertGeometry struct {
+	XMLName xml.Name   `xml:"geom"`
+	Point   GmlPoint   `xml:"Point"`
+}
+
+type GmlPoint struct {
+	XMLName     xml.Name     `xml:"Point"`
+	SrsName     string       `xml:"srsName,attr"`
+	Coordinates GmlCoords    `xml:"coordinates"`
+}
+
+type GmlCoords struct {
+	XMLName xml.Name `xml:"coordinates"`
+	Ts      string   `xml:"ts,attr"`
+	Cs      string   `xml:"cs,attr"`
+	Value   string   `xml:",chardata"`
+}
+
 
 func (d *DynamicElement) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
 	d.XMLName = start.Name
 	d.Fields = make(map[string]string)
-
+	
 	for {
 		tok, err := dec.Token()
 		if err != nil {
@@ -306,11 +327,17 @@ func (d *DynamicElement) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) 
 
 		switch elem := tok.(type) {
 		case xml.StartElement:
-			var content string
-			if err := dec.DecodeElement(&content, &elem); err != nil {
-				return err
+			if elem.Name.Local == "geom" {
+				if err := dec.DecodeElement(&d.Geom, &elem); err != nil {
+					return err
+				}
+			} else {
+				var content string
+				if err := dec.DecodeElement(&content, &elem); err != nil {
+					return err
+				}
+				d.Fields[elem.Name.Local] = strings.TrimSpace(content)
 			}
-			d.Fields[elem.Name.Local] = strings.TrimSpace(content)
 
 		case xml.EndElement:
 			if elem.Name.Local == d.XMLName.Local {
@@ -318,4 +345,88 @@ func (d *DynamicElement) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) 
 			}
 		}
 	}
+}
+
+
+type InsertRequestParams struct {
+	LayerName string
+	Coordinates [2]float64
+	Fields map[string]string
+}
+
+func XMLLayer_ParseInsertionRequest(insertionXML string) ([]InsertRequestParams, error) {
+	var tx Transaction;
+	if err := xml.Unmarshal([]byte(insertionXML), &tx); err != nil {
+		return []InsertRequestParams{}, err;
+	}
+
+	var insertionRequests []InsertRequestParams;
+
+	for _, ins := range tx.Inserts {
+		
+		parts := strings.Split(ins.Layer.Geom.Point.Coordinates.Value, ",")
+		X, err := strconv.ParseFloat(parts[0], 64)
+		if err != nil {
+			return []InsertRequestParams{},err
+		}
+
+		Y, err := strconv.ParseFloat(parts[1], 64)
+		if err != nil {
+			return []InsertRequestParams{}, err
+		}
+
+
+
+		insertionRequest := InsertRequestParams{
+			LayerName: ins.Layer.XMLName.Local,
+			Fields: ins.Layer.Fields,
+			Coordinates: [2]float64{
+				X, 
+				Y,
+			},
+		}
+		insertionRequests = append(insertionRequests, insertionRequest)
+	}
+	return insertionRequests, nil
+}
+
+
+const insertResponseTmpl = `<wfs:WFS_TransactionResponse
+    version="1.0.0"
+    xmlns:wfs="http://www.opengis.net/wfs"
+    xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:gml="http://www.opengis.net/gml">
+
+  <wfs:TransactionResult>
+    <wfs:Status>
+      <wfs:SUCCESS/>
+    </wfs:Status>
+  </wfs:TransactionResult>
+
+  <wfs:TransactionSummary>
+    <wfs:totalInserted>{{len .Fids}}</wfs:totalInserted>
+    <wfs:totalUpdated>0</wfs:totalUpdated>
+    <wfs:totalDeleted>0</wfs:totalDeleted>
+  </wfs:TransactionSummary>
+
+  <wfs:InsertResults>
+    {{range .Fids}}
+    <wfs:Feature>
+      <ogc:FeatureId fid="fid.{{.}}"/>
+    </wfs:Feature>
+    {{end}}
+  </wfs:InsertResults>
+
+</wfs:WFS_TransactionResponse>`
+
+func XMLLayer_CreateInsertResponse(fids []int32) (string, error) {
+	tmpl, err := template.New("insertResponse").Parse(insertResponseTmpl)
+	if err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, map[string]any{"Fids": fids}); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

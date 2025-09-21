@@ -74,10 +74,6 @@ func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func owsHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	query := r.URL.Query()
 	version := getAny(query, "version", "VERSION") // must be 2.0.0
@@ -86,13 +82,53 @@ func owsHandler(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	accessToken := getAny(query, "access_token", "ACCESS_TOKEN")
 
 	if accessToken == "" {
-		http.Error(w, "forbidden", http.StatusForbidden)
-		return
+		authHeader := r.Header.Get("Authorization")
+		const prefix = "Bearer "
+    	if !strings.HasPrefix(authHeader, prefix) {
+        	http.Error(w, "invalid auth header", http.StatusUnauthorized)
+        	return
+    	}
+    	accessToken = strings.TrimPrefix(authHeader, prefix)
 	}
+
 
 	userId, err := ParseSub(accessToken);
 	if err != nil {
 		http.Error(w, "Failed to extract JWT", http.StatusInternalServerError)
+		return
+	}
+
+
+	if r.Method == "POST" && service == "WFS" {
+		body, err := io.ReadAll(r.Body)
+
+		if err != nil {
+			http.Error(w, "failed to read body", http.StatusBadRequest)
+			return
+		}
+		defer r.Body.Close()
+
+		insertionRequests, err := XMLLayer_ParseInsertionRequest(string(body))
+		if err != nil {
+			http.Error(w, "failed to insert", http.StatusInternalServerError);
+			return
+		}
+
+		fids, err := DBLayer_InsertLayer(db, insertionRequests); 
+		if err != nil {
+			http.Error(w, "failed to write to db", http.StatusInternalServerError);
+			return
+		}
+		
+		responseStr, err := XMLLayer_CreateInsertResponse(fids);
+		if err != nil {
+			http.Error(w, "Failed to create insert response", http.StatusInternalServerError);
+		}
+
+		w.Header().Set("Content-Type", "application/xml")
+		w.Write([]byte(responseStr))
+
+
 		return
 	}
 
@@ -163,16 +199,7 @@ func main() {
 	http.HandleFunc("/ows", func (w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%s - %s\n", r.Method, r.URL.String());
 
-		if r.Method == "POST" {
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				http.Error(w, "failed to read body", http.StatusBadRequest)
-				return
-			}
-			defer r.Body.Close()
-        	fmt.Printf("POST Body:\n%s\n", body)
-			r.Body = io.NopCloser(strings.NewReader(string(body)))
-		}
+	
 		owsHandler(w, r, db);
 	})
 	http.HandleFunc("/healthcheck", healthCheckHandler)

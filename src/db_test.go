@@ -474,3 +474,101 @@ func TestGetLayerMetadataByUser(t *testing.T) {
 	}
 
 }
+
+func TestCreateInsertSql(t *testing.T) {
+	request := InsertRequestParams{
+		LayerName: "my_layer",
+		Coordinates: [2]float64{1.234, 3.142},
+		Fields: map[string]string {
+			"foo": "hello",
+			"bar": "baz",
+		},
+	}
+
+	insertstr := Ensure(CreateInsertionSQL(request));
+	expectedStr := "INSERT INTO my_layer (geom,foo,bar) VALUES (ST_GeomFromText('Point(1.234000 3.142000)', 4326),'hello','baz') RETURNING fid" 
+	if insertstr != expectedStr {
+		t.Errorf("Does not EQ %s != %s", insertstr, expectedStr)
+	}
+}
+
+func TestInsertion(t *testing.T) {
+	tableName1 := CreateLayerTable{
+		LayerName: "my_layer",
+		LayerTitle: "Layer 1",
+		Columns: []ColumnType{ 
+			{ 
+				Name: "foo",
+				Dtype: "TEXT",
+			},
+			{
+				Name: "bar",
+				Dtype: "TEXT",
+			},
+		},
+	}
+	
+	requests := []InsertRequestParams{
+		{
+			LayerName: "my_layer",
+			Coordinates: [2]float64{1.234, 3.142},
+			Fields: map[string]string {
+				"foo": "hello",
+				"bar": "baz",
+			},
+		},
+		{
+			LayerName: "my_layer",
+			Coordinates: [2]float64{3.14, 3.122},
+			Fields: map[string]string {
+				"foo": "2",
+				"bar": "4",
+			},
+		},
+	}
+
+	db, err := gorm.Open(postgres.Open(CONNECTION_STRING), &gorm.Config{});
+	if err != nil {
+		t.Errorf("%s", err.Error());
+	}
+	db.AutoMigrate(& LayerMetadata{});
+
+	sqlDB, err := db.DB();
+	if err != nil {
+		log.Fatal(err);
+	}
+
+	defer sqlDB.Close()
+
+	CreateLayerByUser(db, tableName1, 1).Unwrap();
+	defer DeleteLayer(db, "my_layer");
+
+	fids := Ensure(DBLayer_InsertLayer(db, requests))
+	
+	if len(fids) != 2 {
+		t.Errorf("Invalid FIDS")
+	}
+
+	rows, err := DBLayer_GetAllFeatures(db, "my_layer")
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+	r0 := rows[0]
+	r1 := rows[1]
+
+	cond1 := r0.Attr["foo"] == "hello" && r0.Attr["bar"] == "baz"
+	cond2 := r1.Attr["foo"] == "2" && r1.Attr["bar"] == "4"
+	
+	g0 := r0.Geom.Coords()
+	cond3 := g0[0] == 1.234 && g0[1] == 3.142
+	if !cond1 {
+		t.Errorf("r0 does not match")
+	}
+	if ! cond2 {
+		t.Errorf("r1 does not match, %s, %s", r1.Attr["foo"], r1.Attr["bar"])
+	}
+
+	if ! cond3 {
+		t.Errorf("g0 does not match")
+	}
+}
