@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema
+    targetNamespace="http://example.com/gowfs"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:gowfs="http://example.com/gowfs"
+    elementFormDefault="qualified">
+    <xsd:complexType name="breweries_denverType">
+  <xsd:complexContent>
+    <xsd:extension base="gml:AbstractFeatureType">
+      <xsd:sequence>
+        <xsd:element name="geom" type="gml:PointPropertyType" minOccurs="0" maxOccurs="1" nillable="true"></xsd:element>
+        <xsd:element name="brewery_name" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"></xsd:element>
+        <xsd:element name="founded_year" type="xsd:string" minOccurs="0" maxOccurs="1" nillable="true"></xsd:element>
+      </xsd:sequence>
+    </xsd:extension>
+  </xsd:complexContent>
+</xsd:complexType>
+</xsd:schema>

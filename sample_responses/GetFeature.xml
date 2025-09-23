@@ -1,0 +1,35 @@
+<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gowfs="http://example.com/gowfs" numberMatched="3" numberReturned="3">
+  <wfs:member>
+    <gowfs:breweries_denver gml:id="fid.1">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>39.739200 -104.990300</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:founded_year>1995</gowfs:founded_year>
+      <gowfs:brewery_name>Mile High Brewing</gowfs:brewery_name>
+    </gowfs:breweries_denver>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:breweries_denver gml:id="fid.2">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>39.740000 -105.000000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:founded_year>2005</gowfs:founded_year>
+      <gowfs:brewery_name>Rocky Mountain Ales</gowfs:brewery_name>
+    </gowfs:breweries_denver>
+  </wfs:member>
+  <wfs:member>
+    <gowfs:breweries_denver gml:id="fid.3">
+      <gowfs:geom>
+        <gml:Point srsName="http://www.opengis.net/def/crs/EPSG/0/4326">
+          <gml:pos>39.740000 -104.980000</gml:pos>
+        </gml:Point>
+      </gowfs:geom>
+      <gowfs:founded_year>2010</gowfs:founded_year>
+      <gowfs:brewery_name>Denver Beer Works</gowfs:brewery_name>
+    </gowfs:breweries_denver>
+  </wfs:member>
+</wfs:FeatureCollection>

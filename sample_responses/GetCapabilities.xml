@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:WFS_Capabilities
+    version="2.0.0"
+    xmlns:wfs="http://www.opengis.net/wfs/2.0"
+    xmlns:fes="http://www.opengis.net/fes/2.0"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:ows="http://www.opengis.net/ows/1.1"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd
+        http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsAll.xsd">
+   <ows:ServiceIdentification>
+       <ows:Title>Minimal Mock WFS (2.0.0)</ows:Title>
+       <ows:ServiceType>WFS</ows:ServiceType>
+       <ows:ServiceTypeVersion>2.0.0</ows:ServiceTypeVersion>
+   </ows:ServiceIdentification>
+   <ows:OperationsMetadata>
+       <ows:Operation name="GetCapabilities">
+           <ows:DCP>
+               <ows:HTTP>
+                   <ows:Get xlink:href="http://localhost:8000/ows"/>
+               </ows:HTTP>
+           </ows:DCP>
+       </ows:Operation>
+       <ows:Operation name="DescribeFeatureType">
+           <ows:DCP>
+               <ows:HTTP>
+                   <ows:Get xlink:href="http://localhost:8000/ows"/>
+               </ows:HTTP>
+           </ows:DCP>
+       </ows:Operation>
+       <ows:Operation name="GetFeature">
+           <ows:DCP>
+               <ows:HTTP>
+                   <ows:Get xlink:href="http://localhost:8000/ows"/>
+               </ows:HTTP>
+           </ows:DCP>
+       </ows:Operation>
+       <ows:Operation name="Transaction">
+           <ows:DCP>
+               <ows:HTTP>
+                   <ows:Post xlink:href="http://localhost:8000/ows"/>
+               </ows:HTTP>
+           </ows:DCP>
+       </ows:Operation>
+   </ows:OperationsMetadata>
+   <wfs:FeatureTypeList>
+       <wfs:FeatureType>
+           <wfs:Name>hospitals_texas</wfs:Name>
+           <wfs:Title>Texas Hospitals</wfs:Title>
+           <wfs:DefaultCRS>https://www.opengis.net/def/crs/EPSG/0/4326</wfs:DefaultCRS>
+       </wfs:FeatureType>
+       <wfs:FeatureType>
+           <wfs:Name>libraries_portland</wfs:Name>
+           <wfs:Title>Portland Libraries</wfs:Title>
+           <wfs:DefaultCRS>https://www.opengis.net/def/crs/EPSG/0/4326</wfs:DefaultCRS>
+       </wfs:FeatureType>
+       <wfs:FeatureType>
+           <wfs:Name>breweries_denver</wfs:Name>
+           <wfs:Title>Denver Breweries</wfs:Title>
+           <wfs:DefaultCRS>https://www.opengis.net/def/crs/EPSG/0/4326</wfs:DefaultCRS>
+       </wfs:FeatureType>
+       <wfs:FeatureType>
+           <wfs:Name>bike_trails_seattle</wfs:Name>
+           <wfs:Title>Seattle Bike Trails</wfs:Title>
+           <wfs:DefaultCRS>https://www.opengis.net/def/crs/EPSG/0/4326</wfs:DefaultCRS>
+       </wfs:FeatureType>
+   </wfs:FeatureTypeList>
+</wfs:WFS_Capabilities>
