@@ -75,7 +75,7 @@ func TestCreateDescribeFeatureType_ComplexType(t *testing.T) {
 
 func TestMarshalColumnTag(t *testing.T) {
 	columnTag := GetFeature_ColumnTag{
-		Tag: "gowfs:foo",
+		Tag: "foo",
 		Value: "bar",
 	}
 
