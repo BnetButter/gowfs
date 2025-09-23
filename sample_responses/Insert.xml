@@ -1,0 +1,45 @@
+<Transaction xmlns="http://www.opengis.net/wfs" version="1.0.0" service="WFS" xmlns:gml="http://www.opengis.net/gml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://example.com/gowfs http://localhost:8000/ows?SERVICE=WFS&amp;REQUEST=DescribeFeatureType&amp;VERSION=1.0.0&amp;TYPENAME=museums_dc">
+   <Insert xmlns="http://www.opengis.net/wfs">
+       <museums_dc xmlns="http://example.com/gowfs">
+           <museum_name xmlns="http://example.com/gowfs">asdf</museum_name>
+           <admission xmlns="http://example.com/gowfs">asdf</admission>
+           <geom xmlns="http://example.com/gowfs">
+               <gml:Point>
+                   <gml:coordinates ts=" " cs=",">-77.03151633133171572,38.88778058593472764</gml:coordinates>
+               </gml:Point>
+           </geom>
+       </museums_dc>
+   </Insert>
+   <Insert xmlns="http://www.opengis.net/wfs">
+       <museums_dc xmlns="http://example.com/gowfs">
+           <museum_name xmlns="http://example.com/gowfs">d</museum_name>
+           <admission xmlns="http://example.com/gowfs">a</admission>
+           <geom xmlns="http://example.com/gowfs">
+               <gml:Point>
+                   <gml:coordinates ts=" " cs=",">-77.02711462645650897,38.89400941358833563</gml:coordinates>
+               </gml:Point>
+           </geom>
+       </museums_dc>
+   </Insert>
+   <Insert xmlns="http://www.opengis.net/wfs">
+       <museums_dc xmlns="http://example.com/gowfs">
+           <museum_name xmlns="http://example.com/gowfs">asdfL</museum_name>
+           <geom xmlns="http://example.com/gowfs">
+               <gml:Point>
+                   <gml:coordinates ts=" " cs=",">-77.03159938236710502,38.88441701900178771</gml:coordinates>
+               </gml:Point>
+           </geom>
+       </museums_dc>
+   </Insert>
+   <Insert xmlns="http://www.opengis.net/wfs">
+       <museums_dc xmlns="http://example.com/gowfs">
+           <museum_name xmlns="http://example.com/gowfs">NdULL</museum_name>
+           <admission xmlns="http://example.com/gowfs">b</admission>
+           <geom xmlns="http://example.com/gowfs">
+               <gml:Point>
+                   <gml:coordinates ts=" " cs=",">-77.02794513681031674,38.88545515694405452</gml:coordinates>
+               </gml:Point>
+           </geom>
+       </museums_dc>
+   </Insert>
+</Transaction>
